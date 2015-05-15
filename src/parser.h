@@ -11,23 +11,24 @@
 #define PARSER_H
 
 #include <vector>
-#include <stack>
 
-class CParser
+class cParser final
 {
 public:
-    CParser();
-    virtual ~CParser();
-
     void SetScript(const char* script);
     void SetInput(const char* input);
     bool Parse();
 
 private:
-    const char* m_script;
-    const char* m_input;
-    std::vector<unsigned char> m_field;
-    std::stack<int> m_stack;
+    void interprete(const char* script);
+
+private:
+    const char* m_script = nullptr;
+    const char* m_input = nullptr;
+    size_t m_inputPos = 0;
+    size_t m_dataPos = 0;
+    std::vector<char> m_data;
+    std::vector<const char*> m_stack;
 };
 
 #endif //PARSER_H

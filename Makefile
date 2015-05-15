@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-O2 -c -Wall -I/usr/include
-LDFLAGS=-s
+CFLAGS=-std=c++11 -O2 -c -Wall -I/usr/include
+#LDFLAGS=-s
 
 SOURCES= \
 	src/main.cpp \

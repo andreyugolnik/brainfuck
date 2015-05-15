@@ -9,97 +9,98 @@
 
 #include "parser.h"
 
-#include <stdio.h>
-#include <iostream>
+#include <cassert>
+#include <cstdio>
 
-    CParser::CParser()
-    : m_script(0)
-      , m_input(0)
-{
-}
-
-CParser::~CParser()
-{
-}
-
-void CParser::SetScript(const char* script)
+void cParser::SetScript(const char* script)
 {
     m_script = script;
 }
 
-void CParser::SetInput(const char* input)
+void cParser::SetInput(const char* input)
 {
     m_input = input;
 }
 
-bool CParser::Parse()
+bool cParser::Parse()
 {
-    if(m_script == 0)
+    if(m_script == nullptr)
     {
         return false;
     }
 
-    size_t pos_in_field = 0;
-    m_field.push_back(0);
-    int pos_in_field_in_input = 0;
+    m_data.clear();
+    m_data.push_back(0);
+    m_dataPos = 0;
+    m_inputPos = 0;
 
-    for(int pos_in_script = 0; m_script[pos_in_script] != 0; )
+    interprete(m_script);
+
+    return true;
+}
+
+void cParser::interprete(const char* script)
+{
+    for( ; *script != 0; )
     {
-        switch(m_script[pos_in_script])
+        const char cmd = *script;
+
+        switch(cmd)
         {
         case '<':
-            if(pos_in_field > 0)
+            if(m_dataPos > 0)
             {
-                pos_in_field--;
+                m_dataPos--;
             }
             else
             {
-                m_field.insert(m_field.begin(), 0);
+                m_data.insert(m_data.begin(), 0);
             }
             break;
 
         case '>':
-            pos_in_field++;
-            if(pos_in_field > m_field.size() - 1)
+            m_dataPos++;
+            if(m_dataPos == m_data.size())
             {
-                m_field.push_back(0);
+                m_data.push_back(0);
             }
             break;
 
         case '+':
-            m_field[pos_in_field]++;
+            m_data[m_dataPos]++;
             break;
 
         case '-':
-            m_field[pos_in_field]--;
+            m_data[m_dataPos]--;
             break;
 
         case '.':
-            printf("%c", m_field[pos_in_field]);
+            printf("%c", m_data[m_dataPos]);
             break;
 
         case ',':
-            if(m_input != 0 && m_input[pos_in_field_in_input] != 0)
+            if(m_input != 0 && m_input[m_inputPos] != 0)
             {
-                m_field[pos_in_field] = m_input[pos_in_field_in_input++];
+                m_data[m_dataPos] = m_input[m_inputPos++];
             }
             else
             {
-                m_field[pos_in_field] = 0;
+                m_data[m_dataPos] = 0;
             }
             break;
 
         case '[':
-            if(m_field[pos_in_field] == 0)
+            if(m_data[m_dataPos] == 0)
             {
-                int brackets = 0;
-                for( ; m_script[pos_in_script] != 0; pos_in_script++)
+                size_t brackets = 0;
+                for( ; *script != 0; script++)
                 {
-                    if(m_script[pos_in_script] == '[')
+                    const char nextCmd = *script;
+                    if(nextCmd == '[')
                     {
                         brackets++;
                     }
-                    else if(m_script[pos_in_script] == ']')
+                    else if(nextCmd == ']')
                     {
                         brackets--;
                         if(brackets == 0)
@@ -111,34 +112,22 @@ bool CParser::Parse()
             }
             else
             {
-                m_stack.push(pos_in_script);
+                m_stack.push_back(script);
             }
             break;
 
         case ']':
-            if(m_stack.size() != 0)
+            if(m_data[m_dataPos] != 0)
             {
-                int pos = m_stack.top();
-                // we should pop amyway
-                m_stack.pop();
-                if(m_field[pos_in_field] != 0)
-                {
-                    pos_in_script = pos;
-                    continue;
-                }
-            }
-            else
-            {
-                // something wrong or opening '[' absent.
+                assert(m_stack.size() != 0);
+                script = m_stack.back();
+                m_stack.pop_back();
+                continue;
             }
             break;
         }
 
-        pos_in_script++;
+        script++;
     }
-
-    std::cout << std::endl;
-
-    return true;
 }
 
