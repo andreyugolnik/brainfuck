@@ -9,8 +9,9 @@
 
 #include "parser.h"
 
-#include <vector>
 #include <cstdio>
+#include <cstring>
+#include <vector>
 
 int main(int argc, char* argv[])
 {

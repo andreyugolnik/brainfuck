@@ -11,6 +11,7 @@
 #define PARSER_H
 
 #include <vector>
+#include <cstddef>
 
 class cParser final
 {
