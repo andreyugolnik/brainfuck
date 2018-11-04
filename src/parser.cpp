@@ -12,19 +12,25 @@
 #include <cassert>
 #include <cstdio>
 
-void cParser::SetScript(const char* script)
+cParser::cParser(const char* script, const char* input)
+    : m_script(script)
+    , m_input(input)
+{
+}
+
+void cParser::setScript(const char* script)
 {
     m_script = script;
 }
 
-void cParser::SetInput(const char* input)
+void cParser::setInput(const char* input)
 {
     m_input = input;
 }
 
-bool cParser::Parse()
+bool cParser::parse()
 {
-    if(m_script == nullptr)
+    if (m_script == nullptr)
     {
         return false;
     }
@@ -41,14 +47,14 @@ bool cParser::Parse()
 
 void cParser::interprete(const char* script)
 {
-    for( ; *script != 0; )
+    for (; *script != 0;)
     {
         const char cmd = *script;
 
-        switch(cmd)
+        switch (cmd)
         {
         case '<':
-            if(m_dataPos > 0)
+            if (m_dataPos > 0)
             {
                 m_dataPos--;
             }
@@ -60,7 +66,7 @@ void cParser::interprete(const char* script)
 
         case '>':
             m_dataPos++;
-            if(m_dataPos == m_data.size())
+            if (m_dataPos == m_data.size())
             {
                 m_data.push_back(0);
             }
@@ -79,7 +85,7 @@ void cParser::interprete(const char* script)
             break;
 
         case ',':
-            if(m_input != 0 && m_input[m_inputPos] != 0)
+            if (m_input != nullptr && m_input[m_inputPos] != 0)
             {
                 m_data[m_dataPos] = m_input[m_inputPos++];
             }
@@ -90,20 +96,20 @@ void cParser::interprete(const char* script)
             break;
 
         case '[':
-            if(m_data[m_dataPos] == 0)
+            if (m_data[m_dataPos] == 0)
             {
                 size_t brackets = 0;
-                for( ; *script != 0; script++)
+                for (; *script != 0; script++)
                 {
                     const char nextCmd = *script;
-                    if(nextCmd == '[')
+                    if (nextCmd == '[')
                     {
                         brackets++;
                     }
-                    else if(nextCmd == ']')
+                    else if (nextCmd == ']')
                     {
                         brackets--;
-                        if(brackets == 0)
+                        if (brackets == 0)
                         {
                             break;
                         }
@@ -117,7 +123,7 @@ void cParser::interprete(const char* script)
             break;
 
         case ']':
-            if(m_data[m_dataPos] != 0)
+            if (m_data[m_dataPos] != 0)
             {
                 assert(m_stack.size() != 0);
                 script = m_stack.back();
@@ -130,4 +136,3 @@ void cParser::interprete(const char* script)
         script++;
     }
 }
-

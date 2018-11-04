@@ -7,18 +7,20 @@
  *
  *********************************************************/
 
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
-#include <vector>
 #include <cstddef>
+#include <vector>
 
 class cParser final
 {
 public:
-    void SetScript(const char* script);
-    void SetInput(const char* input);
-    bool Parse();
+    cParser(const char* script, const char* input);
+
+    void setScript(const char* script);
+    void setInput(const char* input);
+
+    bool parse();
 
 private:
     void interprete(const char* script);
@@ -26,11 +28,10 @@ private:
 private:
     const char* m_script = nullptr;
     const char* m_input = nullptr;
+
+private:
     size_t m_inputPos = 0;
     size_t m_dataPos = 0;
     std::vector<char> m_data;
     std::vector<const char*> m_stack;
 };
-
-#endif //PARSER_H
-
